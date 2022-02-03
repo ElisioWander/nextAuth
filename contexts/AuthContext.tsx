@@ -1,32 +1,46 @@
 import { createContext, ReactNode } from "react";
+import { api } from "../services/api";
 
+//dados que serão passados para a função signIn
 type SignInCredentials = {
   email: string;
   password: string;
 }
 
-//informações do usuário que devem ser salvas
+//dados que serão compartilhados no contexto
 type AuthContextData = {
   signIn: (credentials: SignInCredentials) => Promise<void>;
-  isAuthenticated: boolean; //informação se o usuário está ou não autenticado
+  isAuthenticated: boolean;
 }
 
+//ReactNode é a tipagem que recebe qualquer elemento React
 type AuthProviderProps = {
   children: ReactNode;
 }
 
-//criando um contexto
+//o contexto em sí
 export const AuthContext = createContext({} as AuthContextData)
 
-export function AuthProvider({ children }: AuthProviderProps) {
+//o provider que ficará em volta de toda a aplicação, possibilitando assim, o compartilhamento
+//das informações
+export function AuthProvider({children}: AuthProviderProps) {
   const isAuthenticated = false
 
   async function signIn({email, password}: SignInCredentials) {
-    console.log({email, password})
+    try {
+      const response = await api.post('sessions', {
+        email,
+        password
+      })
+  
+      console.log(response.data)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
-    <AuthContext.Provider value={{signIn, isAuthenticated}}>
+    <AuthContext.Provider value={{ signIn, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )
