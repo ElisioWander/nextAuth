@@ -11,7 +11,6 @@ export default function Home() {
     event.preventDefault()
 
     await signIn({email, password})
-    
   }
 
   return (
