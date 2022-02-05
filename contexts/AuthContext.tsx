@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useState } from "react";
 import { api } from "../services/api";
+import Router from 'next/router'
 
 type User = {
   email: string;
@@ -16,6 +17,7 @@ type SignInCredentials = {
 //dados que serão compartilhados no contexto
 type AuthContextData = {
   signIn: (credentials: SignInCredentials) => Promise<void>;
+  user: User;
   isAuthenticated: boolean;
 }
 
@@ -30,9 +32,9 @@ export const AuthContext = createContext({} as AuthContextData)
 //o provider que ficará em volta de toda a aplicação, possibilitando assim, o compartilhamento
 //das informações
 export function AuthProvider({children}: AuthProviderProps) {
+  //gravar os dados do usuário
   const [user, setUser] = useState<User>()
-
-  const isAuthenticated = false
+  const isAuthenticated = !!user
 
   async function signIn({email, password}: SignInCredentials) {
     try {
@@ -43,11 +45,15 @@ export function AuthProvider({children}: AuthProviderProps) {
 
       const { permissions, roles } = response.data
 
+      //atualizar os dados do usuário após o logIn
       setUser({
         email,
         permissions,
         roles,
       })
+
+      Router.push('/dashboard')
+
   
       console.log(response.data)
     } catch (error) {
@@ -56,7 +62,7 @@ export function AuthProvider({children}: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider value={{ signIn, isAuthenticated }}>
+    <AuthContext.Provider value={{ signIn, isAuthenticated, user }}>
       {children}
     </AuthContext.Provider>
   )
