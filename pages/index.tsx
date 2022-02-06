@@ -10,7 +10,12 @@ export default function Home() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
-    await signIn({email, password})
+    const data = {
+      email,
+      password
+    }
+
+    await signIn(data)
   }
 
   return (
