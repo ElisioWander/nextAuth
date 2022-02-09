@@ -1,5 +1,7 @@
 import { createContext, ReactNode, useState } from "react";
 import { api } from "../services/api";
+import { setCookie } from "nookies"
+
 import Router from "next/router";
 
 type User = {
@@ -43,7 +45,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         password,
       });
 
-      const { permissions, roles } = response.data;
+      const { permissions, roles, token, refreshToken } = response.data;
+
+      //salvando o token e o refreshToken nos cookies
+      setCookie(undefined, 'nextAuth.token', token, {
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+        path: '/' //todas as rotas da aplicação terão acesso a esse token
+      })
+
+      setCookie(undefined, 'nextAUth.refreshToken', refreshToken, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '/'
+      })
 
       //atualizar os dados do usuário após o logIn
       setUser({
