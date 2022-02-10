@@ -1,6 +1,6 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { api } from "../services/api";
-import { setCookie } from "nookies"
+import { setCookie, parseCookies } from "nookies"
 
 import Router from "next/router";
 
@@ -34,6 +34,20 @@ export const AuthContext = createContext({} as AuthContextData);
 //o provider que ficará em volta de toda a aplicação, possibilitando assim, o compartilhamento
 //das informações
 export function AuthProvider({ children }: AuthProviderProps) {
+
+  useEffect(() => {
+    //pegar todos os cookies com o parseCookies
+    //pegar o token de dentro dos cookies
+    const { 'nextauth.token': token } = parseCookies()
+
+    if(token) {
+      api.get("/me").then(response => {
+        console.log(response)
+      })
+    }
+  }, [])
+
+
   //gravar os dados do usuário
   const [user, setUser] = useState({} as User );
   const isAuthenticated = !!user;
@@ -48,12 +62,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { permissions, roles, token, refreshToken } = response.data;
 
       //salvando o token e o refreshToken nos cookies
-      setCookie(undefined, 'nextAuth.token', token, {
+      setCookie(undefined, 'nextauth.token', token, {
         maxAge: 30 * 24 * 60 * 60, // 30 dias
         path: '/' //todas as rotas da aplicação terão acesso a esse token
       })
 
-      setCookie(undefined, 'nextAUth.refreshToken', refreshToken, {
+      setCookie(undefined, 'nextauth.refreshToken', refreshToken, {
         maxAge: 30 * 24 * 60 * 60,
         path: '/'
       })
