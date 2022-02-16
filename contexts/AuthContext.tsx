@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { api } from "../services/api";
-import { setCookie, parseCookies } from "nookies";
+import { setCookie, parseCookies, destroyCookie } from "nookies";
 
 import Router from "next/router";
 
@@ -31,30 +31,41 @@ type AuthProviderProps = {
 //o contexto em sí
 export const AuthContext = createContext({} as AuthContextData);
 
+export function signOut() {
+  destroyCookie(undefined, "nextauth.token");
+  destroyCookie(undefined, "nextauth.refreshToken");
+
+  Router.push("/");
+}
+
 //o provider que ficará em volta de toda a aplicação, possibilitando assim, o compartilhamento
 //das informações
 export function AuthProvider({ children }: AuthProviderProps) {
+  //gravar os dados do usuário
+  const [user, setUser] = useState({} as User);
+  const isAuthenticated = !!user;
+
   useEffect(() => {
     // pegar todos os cookies com o parseCookies
     // pegar o token de dentro dos cookies
     const { "nextauth.token": token } = parseCookies();
 
     if (token) {
-      api.get("/me").then((response) => {
-        const { email, permissions, roles } = response.data;
+      api
+        .get("/me")
+        .then((response) => {
+          const { email, permissions, roles } = response.data;
 
-        setUser({
-          email,
-          permissions,
-          roles,
+          setUser({
+            email,
+            permissions,
+            roles,
+          });
+        }).catch(() => {
+          signOut()
         });
-      });
     }
   }, []);
-
-  //gravar os dados do usuário
-  const [user, setUser] = useState({} as User);
-  const isAuthenticated = !!user;
 
   async function signIn({ email, password }: SignInCredentials) {
     try {
@@ -82,8 +93,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         permissions,
         roles,
       });
-      
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       Router.push("/dashboard");
 

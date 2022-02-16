@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { parseCookies, setCookie } from "nookies";
+import { signOut } from "../contexts/AuthContext";
 
 interface FailedRequestsQueue {
   onSuccess: (token: string) => void;
@@ -107,8 +108,10 @@ api.interceptors.response.use(
           });
         });
       } else {
-        //deslogar o usuário
+        signOut()
       }
     }
+
+    return Promise.reject(error)
   }
 );
