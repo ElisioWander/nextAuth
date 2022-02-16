@@ -1,10 +1,15 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { parseCookies, setCookie } from "nookies";
+
+interface FailedRequestsQueue {
+  onSuccess: (token: string) => void;
+  onFailure: (err: AxiosError) => void;
+}
 
 let cookies = parseCookies();
 
 let isRefreshing = false;
-let failedRequestsQueue = []
+let failedRequestsQueue = Array<FailedRequestsQueue>();
 
 export const api = axios.create({
   baseURL: "http://localhost:3333",
@@ -33,7 +38,7 @@ api.interceptors.response.use(
         const { "nextauth.refreshToken": refreshToken } = cookies;
 
         //possui todas as informações das requisições que deram erro
-        const originalConfig = error.config
+        const originalConfig = error.config;
 
         if (!isRefreshing) {
           isRefreshing = true;
@@ -64,33 +69,43 @@ api.interceptors.response.use(
               );
 
               //enviar o token no cabeçalho da requisição
-              api.defaults.headers.common[
-                "Authorization"
-              ] = `Bearer ${cookies["nextauth.token"]}`;
+              api.defaults.headers.common["Authorization"] = `Bearer ${cookies["nextauth.token"]}`;
+
+              //percorrendo a lista de requisições que deu erro e enviando o token para a função onSuccess
+              failedRequestsQueue.forEach(request => request.onSuccess(token))
+              failedRequestsQueue = []
+
+            }).catch(err => {
+              failedRequestsQueue.forEach(request => request.onFailure(err))
+              failedRequestsQueue = []
+            }).finally(() => {
+              isRefreshing = false
             });
         }
-        
+
         //criar uma fila de requisições
         //esperar que o token seja renovado para então chamar novamente as requisições
         //que falharam
         return new Promise((resolve, reject) => {
           failedRequestsQueue.push({
             onSuccess: (token: string) => {
-              if(!originalConfig?.headers) {
+              if (!originalConfig?.headers) {
                 (error: AxiosError) => {
-                  console.log(error)
-                }
+                  console.log(error);
+                };
 
-                return
+                return;
               }
 
-              originalConfig.headers['Authorization'] = `Bearer ${token}`
-            },
-            onFailure: () => {
+              originalConfig.headers["Authorization"] = `Bearer ${token}`;
 
-            }
-          })
-        })
+              resolve(api(originalConfig))
+            },
+            onFailure: (err: AxiosError) => {
+              reject(err)
+            },
+          });
+        });
       } else {
         //deslogar o usuário
       }
