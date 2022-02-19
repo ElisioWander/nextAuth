@@ -1,9 +1,23 @@
-import { GetServerSideProps } from "next";
 import { parseCookies } from "nookies";
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { GetServerSideProps } from "next";
+
+import Router from 'next/router'
 
 export default function Home() {
+  //fazer essa verificação no lado do client vai resultar em uma rápida renderização
+  //do component que não deviria aparecer, caso ouvesse um token registrado nos cookies
+  //se for feita pelo lado do servidor utilizando getServerSideProps essa renderização indesejada
+  //não irá ocorrer
+  // useEffect(() => {
+  //   const { 'nextauth.token': token } = parseCookies()
+
+  //   if(token) {
+  //     Router.push('/dashboard')
+  //   }
+  // }, [])
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -48,8 +62,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       }
     }
   }
-
+  
   return {
-    props: {},
-  };
-};
+    props: {}
+  }
+}
