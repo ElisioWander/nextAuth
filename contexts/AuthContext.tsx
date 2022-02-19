@@ -98,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       Router.push("/dashboard");
 
-      console.log(response.data);
+      // console.log(response.data);
     } catch (error) {
       console.log(error);
     }
