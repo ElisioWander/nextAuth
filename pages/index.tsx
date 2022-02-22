@@ -4,6 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { GetServerSideProps } from "next";
 
 import Router from 'next/router'
+import { withSSRGest } from "../utils/withSSRGest";
 
 export default function Home() {
   //fazer essa verificação no lado do client vai resultar em uma rápida renderização
@@ -17,6 +18,7 @@ export default function Home() {
   //     Router.push('/dashboard')
   //   }
   // }, [])
+
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,19 +53,10 @@ export default function Home() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { 'nextauth.token': token } = parseCookies(ctx)
+export const getServerSideProps = withSSRGest( async (ctx) => {
 
-  if(token) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      }
-    }
-  }
-  
+
   return {
     props: {}
   }
-}
+})
