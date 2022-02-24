@@ -1,9 +1,5 @@
-import { parseCookies } from "nookies";
-import { FormEvent, useContext, useEffect, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { GetServerSideProps } from "next";
-
-import Router from 'next/router'
 import { withSSRGest } from "../utils/withSSRGest";
 
 export default function Home() {
