@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { GetServerSidePropsContext } from "next";
 import { parseCookies, setCookie } from "nookies";
 import { signOut } from "../contexts/AuthContext";
+import { AuthTokenError } from "./errors/AuthTokenError";
 
 interface FailedRequestsQueue {
   onSuccess: (token: string) => void;
@@ -131,6 +132,8 @@ export function setupAPIClient(ctx: context = undefined) {
           if (process.browser) {
             //se falhar eu quero que o usuário seja deslogado
             signOut();
+          } else {
+            return Promise.reject(new AuthTokenError())
           }
         }
       }
