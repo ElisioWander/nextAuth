@@ -42,7 +42,7 @@ export function signOut() {
 //das informações
 export function AuthProvider({ children }: AuthProviderProps) {
   //gravar os dados do usuário
-  const [user, setUser] = useState({} as User);
+  const [user, setUser] = useState<User>();
   const isAuthenticated = !!user;
 
   useEffect(() => {
