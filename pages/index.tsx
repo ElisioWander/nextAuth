@@ -1,4 +1,5 @@
-import { FormEvent, useContext, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { Input } from "../components/Input";
 import { AuthContext } from "../contexts/AuthContext";
 import { withSSRGest } from "../utils/withSSRGest";
 
@@ -29,20 +30,25 @@ export default function Home() {
       password,
     };
 
+    console.log(data)
+
     await signIn(data);
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+      <Input 
+        type={'email'}
+        name={email} 
+        labelName={'E-mail'} 
+        setValue={setEmail} 
       />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+      
+      <Input 
+        type={'password'}
+        name={password}
+        labelName={'Senha'}
+        setValue={setPassword}
       />
       <button type="submit">Entrar</button>
     </form>

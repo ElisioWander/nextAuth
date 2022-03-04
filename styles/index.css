@@ -12,12 +12,14 @@ html {
     align-items: center;
     justify-content: center;
 
+    font-family: 'Roboto', sans-serif;
+
     background-color: aliceblue;
 }
 
 form {
-    width: 400px;
-    height: 200px;
+    width: 380px;
+    height: 250px;
 
     display: flex;
     flex-direction: column;
@@ -36,6 +38,13 @@ input, button {
     border-radius: 0.5rem;
 
     margin: 0.5rem;
+}
+
+label {
+    padding-left: 0.5rem;
+    font-weight: bold;
+
+    color: rgb(78, 78, 78);
 }
 
 button {
