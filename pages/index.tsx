@@ -1,6 +1,5 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Input } from "../components/Input";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { AuthContext } from "../contexts/AuthContext";
 import { withSSRGest } from "../utils/withSSRGest";
 
@@ -23,39 +22,38 @@ export default function Home() {
 
   const { signIn } = useContext(AuthContext);
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-
+  const handleSignIn = async () => {
     const data = {
       email,
       password,
     };
-
+  
     console.log(data)
     await signIn(data);
   }
 
-  const { register, formState: { errors } } = useForm()
+  const { register, formState: { errors }, handleSubmit } = useForm()
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Input 
-        type={'email'}
-        name={email} 
-        labelName={'E-mail'} 
-        setValue={setEmail}
-        {...register('email', { required: true })}
-        error={errors.email}
+    <form onSubmit={handleSubmit(handleSignIn)} >
+      <input
+        type="email" 
+        value={email}
+        {...register('email', {required: true})}
+        onChange={e => setEmail(e.target.value)}
       />
-      
-      <Input 
-        type={'password'}
-        name={password}
-        labelName={'Senha'}
-        setValue={setPassword}
-        {...register('password')}
-        error={errors.password}
+      {errors.email?.type === 'required' && (
+        <p>E-mail obrigatório</p>
+      )}
+      <input
+        type="password"
+        value={password}
+        {...register('password', {required: true})}
+        onChange={e => setPassword(e.target.value)}
       />
+      {errors.password?.type === 'required' && (
+        <p>Senha obrigatória</p>
+      )}
       <button type="submit">Entrar</button>
     </form>
   );
