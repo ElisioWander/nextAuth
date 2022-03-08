@@ -1,13 +1,15 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, forwardRef, ForwardRefRenderFunction } from "react";
+import { FieldError } from "react-hook-form";
 
-interface InputTestProps {
-  name: string;
-  labelName: string;
-  type: string;
+interface InputProps {
   setValue: (e) => void;
+  name: string;
+  labelName?: string;
+  type: string;
+  error: FieldError
 }
 
-export function Input({ name, labelName, type, setValue }: InputTestProps) {
+const InputBase: ForwardRefRenderFunction<HTMLInputElement ,InputProps> = ({name, labelName, setValue, type, error}) => {
   return (
     <>
       <label htmlFor={name}>{labelName}</label>
@@ -20,3 +22,5 @@ export function Input({ name, labelName, type, setValue }: InputTestProps) {
     </>
   );
 }
+
+export const Input = forwardRef(InputBase);

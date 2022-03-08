@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Input } from "../components/Input";
 import { AuthContext } from "../contexts/AuthContext";
 import { withSSRGest } from "../utils/withSSRGest";
@@ -22,7 +23,7 @@ export default function Home() {
 
   const { signIn } = useContext(AuthContext);
 
-  async function handleSubmit(event: FormEvent) {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
     const data = {
@@ -31,9 +32,10 @@ export default function Home() {
     };
 
     console.log(data)
-
     await signIn(data);
   }
+
+  const { register, formState: { errors } } = useForm()
 
   return (
     <form onSubmit={handleSubmit}>
@@ -41,7 +43,9 @@ export default function Home() {
         type={'email'}
         name={email} 
         labelName={'E-mail'} 
-        setValue={setEmail} 
+        setValue={setEmail}
+        {...register('email', { required: true })}
+        error={errors.email}
       />
       
       <Input 
@@ -49,6 +53,8 @@ export default function Home() {
         name={password}
         labelName={'Senha'}
         setValue={setPassword}
+        {...register('password')}
+        error={errors.password}
       />
       <button type="submit">Entrar</button>
     </form>
