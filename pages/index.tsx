@@ -1,7 +1,14 @@
-import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AuthContext } from "../contexts/AuthContext";
 import { withSSRGest } from "../utils/withSSRGest";
+import { yupResolver }from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+
+type SignInData = {
+  email: string;
+  password: string;
+}
 
 export default function Home() {
   //fazer essa verificação no lado do client vai resultar em uma rápida renderização
@@ -22,7 +29,7 @@ export default function Home() {
 
   const { signIn } = useContext(AuthContext);
 
-  const handleSignIn = async () => {
+  const handleSignIn: SubmitHandler<SignInData> = async () => {
     const data = {
       email,
       password,
@@ -32,28 +39,39 @@ export default function Home() {
     await signIn(data);
   }
 
-  const { register, formState: { errors }, handleSubmit } = useForm()
+  const schema = yup.object({
+    email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
+    password: yup.string().required('Senha obrigatória')
+  })
+
+  const { register, formState: { errors }, handleSubmit } = useForm({
+    resolver: yupResolver(schema)
+  })
 
   return (
     <form onSubmit={handleSubmit(handleSignIn)} >
+      <label htmlFor="email">E-mail</label>
       <input
         type="email" 
         value={email}
         {...register('email', {required: true})}
         onChange={e => setEmail(e.target.value)}
       />
-      {errors.email?.type === 'required' && (
-        <p>E-mail obrigatório</p>
+      {errors && (
+        <p>{errors.email?.message}</p>
       )}
+
+      <label htmlFor="password">Password</label>
       <input
         type="password"
         value={password}
         {...register('password', {required: true})}
         onChange={e => setPassword(e.target.value)}
       />
-      {errors.password?.type === 'required' && (
-        <p>Senha obrigatória</p>
-      )}
+      { errors && (
+        <p>{errors.password?.message}</p>
+      ) }
+
       <button type="submit">Entrar</button>
     </form>
   );

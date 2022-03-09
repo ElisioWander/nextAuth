@@ -19,7 +19,7 @@ html {
 
 form {
     width: 380px;
-    height: 250px;
+    height: 300px;
 
     display: flex;
     flex-direction: column;
@@ -31,6 +31,13 @@ form {
     background-color: rgb(224, 222, 222);
 }
 
+label {
+    padding-left: 0.5rem;
+    font-weight: bold;
+
+    color: rgb(78, 78, 78);
+}
+
 input, button {
     padding: 0.5rem 1rem;
 
@@ -40,11 +47,14 @@ input, button {
     margin: 0.5rem;
 }
 
-label {
-    padding-left: 0.5rem;
-    font-weight: bold;
+p {
+    font-size: 0.7rem;
 
-    color: rgb(78, 78, 78);
+    margin-bottom: 1rem;
+
+    padding-left: 1rem;
+
+    color: rgb(209, 18, 18);
 }
 
 button {
